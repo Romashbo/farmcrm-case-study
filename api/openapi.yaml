@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: FarmCRM — public API sample
+  version: 1.0.0
+  description: Selected reconstructed endpoints, not runtime verified. No real server addresses.
+servers:
+  - url: https://example.invalid/api
+security:
+  - bearerAuth: []
+paths:
+  /farms:
+    post:
+      summary: Создать ферму
+      operationId: createFarm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                location:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Business validation
+        '401':
+          description: Authentication or confirmation required
+        '402':
+          description: Active subscription required
+        '403':
+          description: Forbidden or plan limit exceeded
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+  /medications/{id}/consume:
+    post:
+      summary: Списать препарат
+      operationId: consumeMedication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [farmId, quantity]
+              properties:
+                farmId:
+                  type: integer
+                quantity:
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                reason:
+                  type: string
+                eventId:
+                  type: integer
+      responses:
+        '201':
+          description: Movement created
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Invalid request or insufficient stock
+        '401':
+          description: Authentication required
+        '402':
+          description: Active subscription required
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Server error
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
